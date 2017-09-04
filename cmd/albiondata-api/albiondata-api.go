@@ -101,6 +101,12 @@ func apiHandleStatsPricesItem(c echo.Context) error {
 	}
 	ageTime := time.Now().Add(-time.Duration(ageInt) * time.Second)
 
+	locInt, err := strconv.Atoi(c.QueryParam("location"))
+	//fmt.Printf("%s", adslib.Location(locInt))
+	if err != nil {
+		fmt.Printf("%v\n", err)
+	}
+
 	queryItemIDs := strings.Split(c.Param("item"), ",")
 	itemIDs := []string{}
 
@@ -122,7 +128,8 @@ func apiHandleStatsPricesItem(c echo.Context) error {
 	}
 
 	for _, itemID := range itemIDs {
-		for _, l := range adslib.Locations() {
+		if locInt != 0 {
+			l := adslib.Location(locInt)
 			lres := lib.APIStatsPricesItem{
 				ItemID: itemID,
 				City:   l.String(),
@@ -164,6 +171,52 @@ func apiHandleStatsPricesItem(c echo.Context) error {
 
 			if found {
 				result = append(result, lres)
+			}
+		} else {
+			for _, l := range adslib.Locations() {
+				//fmt.Printf("%s", l)
+				lres := lib.APIStatsPricesItem{
+					ItemID: itemID,
+					City:   l.String(),
+				}
+
+				found := false
+
+				// Find lowest offer price
+				m := adslib.NewModelMarketOrder()
+				if err := db.Select("*, DATE_FORMAT(`updated_at`, '%Y-%m-%d %H:%i') as updated_at_no_seconds").Where("location = ? and item_id = ? and auction_type = ? and updated_at >= ?", l, itemID, "offer", ageTime).Order("updated_at_no_seconds desc, price asc").First(&m).Error; err == nil {
+					found = true
+					lres.SellPriceMin = m.Price
+					lres.SellPriceMinDate = m.UpdatedAt
+				}
+
+				// Find highest offer price
+				m = adslib.NewModelMarketOrder()
+				if err := db.Select("*, DATE_FORMAT(`updated_at`, '%Y-%m-%d %H:%i') as updated_at_no_seconds").Where("location = ? and item_id = ? and auction_type = ? and updated_at >= ?", l, itemID, "offer", ageTime).Order("updated_at_no_seconds desc, price desc").First(&m).Error; err == nil {
+					found = true
+					lres.SellPriceMax = m.Price
+					lres.SellPriceMaxDate = m.UpdatedAt
+				}
+
+				// Find lowest request price
+				m = adslib.NewModelMarketOrder()
+				if err := db.Select("*, DATE_FORMAT(`updated_at`, '%Y-%m-%d %H:%i') as updated_at_no_seconds").Where("location = ? and item_id = ? and auction_type = ? and updated_at >= ?", l, itemID, "request", ageTime).Order("updated_at_no_seconds desc, price asc").First(&m).Error; err == nil {
+					found = true
+					lres.BuyPriceMin = m.Price
+					lres.BuyPriceMinDate = m.UpdatedAt
+				}
+
+				// Find highest request price
+				m = adslib.NewModelMarketOrder()
+				if err := db.Select("*, DATE_FORMAT(`updated_at`, '%Y-%m-%d %H:%i') as updated_at_no_seconds").Where("location = ? and item_id = ? and auction_type = ? and updated_at >= ?", l, itemID, "request", ageTime).Order("updated_at_no_seconds desc, price desc").First(&m).Error; err == nil {
+					found = true
+					lres.BuyPriceMax = m.Price
+					lres.BuyPriceMaxDate = m.UpdatedAt
+				}
+
+				if found {
+					result = append(result, lres)
+				}
 			}
 		}
 	}
