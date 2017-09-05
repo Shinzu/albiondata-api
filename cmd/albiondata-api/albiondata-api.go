@@ -180,6 +180,9 @@ func apiHandleStatsPricesItem(c echo.Context) error {
 		if len(locInt) > 0 {
 			for _, loc := range locInt {
 				l := adslib.Location(loc)
+				if len(l.String()) == 0 {
+					continue
+				}
 				result = queryPrices(result, itemID, l, ageTime)
 			}
 		} else {
