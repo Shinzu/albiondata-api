@@ -127,8 +127,6 @@ func apiHandleStatsPricesItem(c echo.Context) error {
 			if err != nil {
 				fmt.Printf("%v\n", err)
 			}
-			//queryLoc := adslib.Location(qLIDint)
-			//fmt.Printf("%s\n", queryLoc)
 			for _, l := range adslib.Locations() {
 				if strings.Contains(l.String(), adslib.Location(qLIDint).String()) {
 					locs = append(locs, l)
