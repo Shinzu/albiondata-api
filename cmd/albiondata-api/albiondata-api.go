@@ -118,6 +118,26 @@ func apiHandleStatsPricesItem(c echo.Context) error {
 		}
 	}
 
+	// locID query param
+	if len(c.QueryParam("locID")) > 0 {
+		queryLIDs := strings.Split(c.QueryParam("locID"), ",")
+		locs = []adslib.Location{}
+		for _, queryLID := range queryLIDs {
+			qLIDint, err := strconv.Atoi(queryLID)
+			if err != nil {
+				fmt.Printf("%v\n", err)
+			}
+			//queryLoc := adslib.Location(qLIDint)
+			//fmt.Printf("%s\n", queryLoc)
+			for _, l := range adslib.Locations() {
+				if strings.Contains(l.String(), adslib.Location(qLIDint).String()) {
+					locs = append(locs, l)
+					break
+				}
+			}
+		}
+	}
+
 	// item query param
 	queryItemIDs := strings.Split(c.Param("item"), ",")
 	itemIDs := []string{}
@@ -201,6 +221,26 @@ func apiHandleStatsChartsItem(c echo.Context) error {
 		for _, queryLoc := range queryLocs {
 			for _, l := range adslib.Locations() {
 				if strings.Contains(l.String(), queryLoc) {
+					locs = append(locs, l)
+					break
+				}
+			}
+		}
+	}
+
+	// locID query param
+	if len(c.QueryParam("locID")) > 0 {
+		queryLIDs := strings.Split(c.QueryParam("locID"), ",")
+		locs = []adslib.Location{}
+		for _, queryLID := range queryLIDs {
+			qLIDint, err := strconv.Atoi(queryLID)
+			if err != nil {
+				fmt.Printf("%v\n", err)
+			}
+			//queryLoc := adslib.Location(qLIDint)
+			//fmt.Printf("%s\n", queryLoc)
+			for _, l := range adslib.Locations() {
+				if strings.Contains(l.String(), adslib.Location(qLIDint).String()) {
 					locs = append(locs, l)
 					break
 				}
