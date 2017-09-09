@@ -128,7 +128,7 @@ func apiHandleStatsPricesItem(c echo.Context) error {
 				fmt.Printf("%v\n", err)
 			}
 			for _, l := range adslib.Locations() {
-				if strings.Contains(l.String(), adslib.Location(qLIDint).String()) {
+				if strings.EqualFold(l.String(), adslib.Location(qLIDint).String()) {
 					locs = append(locs, l)
 					break
 				}
@@ -236,7 +236,7 @@ func apiHandleStatsChartsItem(c echo.Context) error {
 				fmt.Printf("%v\n", err)
 			}
 			for _, l := range adslib.Locations() {
-				if strings.Contains(l.String(), adslib.Location(qLIDint).String()) {
+				if strings.EqualFold(l.String(), adslib.Location(qLIDint).String()) {
 					locs = append(locs, l)
 					break
 				}
