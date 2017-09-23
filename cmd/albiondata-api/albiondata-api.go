@@ -172,6 +172,7 @@ func apiHandleStatsPricesItem(c echo.Context) error {
 				found = true
 				lres.SellPriceMin = m.Price
 				lres.SellPriceMinDate = m.UpdatedAt
+				lres.SellAmountMin = m.Amount
 			}
 
 			// Find highest offer price
@@ -180,6 +181,7 @@ func apiHandleStatsPricesItem(c echo.Context) error {
 				found = true
 				lres.SellPriceMax = m.Price
 				lres.SellPriceMaxDate = m.UpdatedAt
+				lres.SellAmountMax = m.Amount
 			}
 
 			// Find lowest request price
@@ -188,6 +190,7 @@ func apiHandleStatsPricesItem(c echo.Context) error {
 				found = true
 				lres.BuyPriceMin = m.Price
 				lres.BuyPriceMinDate = m.UpdatedAt
+				lres.BuyAmountMin = m.Amount
 			}
 
 			// Find highest request price
@@ -196,6 +199,7 @@ func apiHandleStatsPricesItem(c echo.Context) error {
 				found = true
 				lres.BuyPriceMax = m.Price
 				lres.BuyPriceMaxDate = m.UpdatedAt
+				lres.BuyAmountMax = m.Amount
 			}
 
 			if found {
